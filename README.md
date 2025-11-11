@@ -69,6 +69,8 @@ export default function App() {
 
 | Prop               | Type                                          | Default   | Description                   |
 | :----------------- | :-------------------------------------------- | :-------- | :---------------------------- |
+| `title`            | `String`                                      | `title`   | Title of contribution grid    |
+| `titleStyle`       | `Object`                                      | `{}`      | Style object for title        |
 | `data`             | `Array<{date: string, contributed: boolean}>` | `[]`      | Array of contribution data    |
 | `activeColor`      | `string`                                      | `#4CAF50` | Active cell color             |
 | `inactiveColor`    | `string`                                      | `#E0E0E0` | Inactive cell color           |
