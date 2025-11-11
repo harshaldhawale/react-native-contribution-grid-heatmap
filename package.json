@@ -1,0 +1,35 @@
+{
+  "name": "react-native-contribution-grid-heatmap",
+  "version": "1.0.1",
+  "description": "A customizable contribution grid heatmap component for React Native apps.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harshaldhawale/react-native-contribution-grid-heatmap.git"
+  },
+  "keywords": [
+    "react-native",
+    "react-native-ui",
+    "contribution-grid",
+    "github-activity",
+    "heatmap",
+    "calendar-grid",
+    "react-native-heatmap",
+    "react-native-contribution-grid",
+    "react-native-contribution-grid-heatmap"
+  ],
+  "author": "Harshal Dhawale",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/harshaldhawale/react-native-contribution-grid-heatmap/issues"
+  },
+  "homepage": "https://github.com/harshaldhawale/react-native-contribution-grid-heatmap#readme",
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "react-native": "^0.81.5"
+  }
+}
