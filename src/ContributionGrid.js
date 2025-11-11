@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, Text } from "react-native";
 
 const ContributionGrid = ({
   title = "title",
