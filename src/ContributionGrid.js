@@ -2,6 +2,8 @@ import React from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 
 const ContributionGrid = ({
+  title = "title",
+  titleStyle = {},
   data = [], // Example: [{ date: '2025-11-08', contributed: true }]
   activeColor = "#4CAF50",
   inactiveColor = "#E0E0E0",
@@ -66,6 +68,7 @@ const ContributionGrid = ({
         },
       ]}
     >
+      <Text style={titleStyle}>{title}</Text>
       <View style={{ flexDirection: "row" }}>
         {Array.from({ length: columns }).map((_, col) => (
           <View key={col} style={{ flexDirection: "column", marginRight: gap }}>
