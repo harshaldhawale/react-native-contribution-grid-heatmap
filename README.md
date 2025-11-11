@@ -5,9 +5,8 @@ Designed and maintained by **React Native Lab** 🧪.
 
 ---
 
-## 🚀 Installation
+## Installation
 
-[text](../../rnl-contribution-grid/rnl-contribution-grid/package.json)
 
 ```bash
 npm install react-native-contribution-grid-heatmap
@@ -19,9 +18,9 @@ npm install react-native-contribution-grid-heatmap
 yarn add react-native-contribution-grid-heatmap
 ```
 
-## 🖼️ Preview
+## Example 1
 
-<image src="/assets/contribution-grid.jpg" alt=""/>
+<image src="/assets/contribution-grid1.jpg" alt=""/>
 
 ## Usage/Examples
 
@@ -42,6 +41,7 @@ export default function App() {
       <ContributionGrid
         title="Contribution Grid Title"
         titleStyle={{ marginBottom: 10, fontWeight: "bold" }}
+        showTitle={true}
         data={contributionData}
         activeColor="#00C853"
         inactiveColor="#E0E0E0"
@@ -51,6 +51,51 @@ export default function App() {
         containerMargin={10}
         gap={4}
         columns={16}
+        showDate={true}
+        showDayLabels={true}
+        showMonthLabels={true}
+      />
+    </View>
+  );
+}
+```
+
+## Example 2
+
+<image src="/assets/contribution-grid2.jpg" alt=""/>
+
+## Usage/Examples
+
+```javascript
+import React from "react";
+import { View } from "react-native";
+import ContributionGrid from "react-native-contribution-grid-heatmap";
+
+const contributionData = [
+  { date: "2025-10-06", contributed: true },
+  { date: "2025-10-10", contributed: true },
+  { date: "2025-11-04", contributed: true },
+];
+
+export default function App() {
+  return (
+    <View>
+      <ContributionGrid
+        title="Contribution Grid Title"
+        titleStyle={{ marginBottom: 10, fontWeight: "bold" }}
+        showTitle={false}
+        data={contributionData}
+        activeColor="#00C853"
+        inactiveColor="#E0E0E0"
+        borderColor="#00C853"
+        backgroundColor="#F8F8F8"
+        containerPadding={10}
+        containerMargin={10}
+        gap={4}
+        columns={16}
+        showDate={false}
+        showDayLabels={false}
+        showMonthLabels={false}
       />
     </View>
   );
@@ -71,6 +116,7 @@ export default function App() {
 | :----------------- | :-------------------------------------------- | :-------- | :---------------------------- |
 | `title`            | `String`                                      | `title`   | Title of contribution grid    |
 | `titleStyle`       | `Object`                                      | `{}`      | Style object for title        |
+| `showTitle`        | `Boolean`                                     | `true`    | Show title                    |
 | `data`             | `Array<{date: string, contributed: boolean}>` | `[]`      | Array of contribution data    |
 | `activeColor`      | `string`                                      | `#4CAF50` | Active cell color             |
 | `inactiveColor`    | `string`                                      | `#E0E0E0` | Inactive cell color           |
@@ -81,6 +127,9 @@ export default function App() {
 | `cellSize`         | `number`                                      | `20`      | Base size of each cell        |
 | `gap`              | `number`                                      | `4`       | Gap between cells             |
 | `columns`          | `number`                                      | `16`      | Number of columns (weeks)     |
+| `showDate`         | `Boolean`                                     | `true`    | Show date inside grid cell    |
+| `showDayLabels`    | `Boolean`                                     | `true`    | Show day labels on grid       |
+| `showMonthLabels`  | `Boolean`                                     | `true`    | Show month labels on grid     |
 
 ## About React Native Lab
 

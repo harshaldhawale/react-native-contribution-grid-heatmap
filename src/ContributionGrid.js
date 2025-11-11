@@ -1,9 +1,10 @@
 import React from "react";
-import { View, StyleSheet, Dimensions, Text } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 const ContributionGrid = ({
   title = "title",
   titleStyle = {},
+  showTitle = true,
   data = [], // Example: [{ date: '2025-11-08', contributed: true }]
   activeColor = "#4CAF50",
   inactiveColor = "#E0E0E0",
@@ -14,12 +15,15 @@ const ContributionGrid = ({
   cellSize = 20,
   gap = 4,
   columns = 16,
+  showDate = true,
+  showMonthLabels = true,
+  showDayLabels = true,
 }) => {
   const rows = 7; // Sunday to Saturday
   const today = new Date();
 
   // Calculate start (first visible Sunday) and end (upcoming Saturday)
-  const daysSinceSunday = today.getDay(); // 0=Sun
+  const daysSinceSunday = today.getDay();
   const endDate = new Date(today);
   endDate.setDate(today.getDate() + (6 - daysSinceSunday));
   const firstVisibleDate = new Date(endDate);
@@ -48,59 +52,143 @@ const ContributionGrid = ({
   const screenWidth = Dimensions.get("window").width;
   const totalGapWidth = gap * (columns - 1);
   const availableWidth =
-    screenWidth - containerPadding * 2 - containerMargin * 2 - totalGapWidth;
+    screenWidth -
+    containerPadding * 2 -
+    containerMargin * 2 -
+    totalGapWidth -
+    30; // space for day labels
   const adjustedCellSize = Math.min(cellSize, availableWidth / columns);
 
   const cellStyle = {
     width: adjustedCellSize,
     height: adjustedCellSize,
     borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
   };
+
+  const monthLabels = [];
+  let lastMonth = null;
+
+  for (let c = 0; c < columns; c++) {
+    const firstDateOfColumn = gridDates[c * rows];
+    const monthName = firstDateOfColumn.toLocaleString("default", {
+      month: "short",
+    });
+
+    if (monthName !== lastMonth) {
+      monthLabels.push(monthName);
+      lastMonth = monthName;
+    } else {
+      monthLabels.push(""); // Empty label for same month
+    }
+  }
+
+  const dayLabels = ["S", "M", "T", "W", "T", "F", "S"];
 
   return (
     <View
       style={[
         styles.container,
-        {
-          backgroundColor,
-          margin: containerMargin,
-          padding: containerPadding,
-        },
+        { backgroundColor, margin: containerMargin, padding: containerPadding },
       ]}
     >
-      <Text style={titleStyle}>{title}</Text>
-      <View style={{ flexDirection: "row" }}>
-        {Array.from({ length: columns }).map((_, col) => (
-          <View key={col} style={{ flexDirection: "column", marginRight: gap }}>
-            {Array.from({ length: rows }).map((_, row) => {
-              const index = col * rows + row;
-              const date = gridDates[index];
-              const dateKey = date.toDateString();
-              const isToday = isSameDay(date, today);
-              const isFuture = date > today;
-              const active = contributionMap[dateKey] === true;
+      {showTitle && <Text style={titleStyle}>{title}</Text>}
 
-              return (
-                <View
-                  key={row}
-                  style={[
-                    cellStyle,
-                    {
-                      backgroundColor: isFuture
-                        ? inactiveColor
-                        : active
-                        ? activeColor
-                        : inactiveColor,
-                      borderWidth: isToday ? 2 : 0,
-                      borderColor: isToday ? borderColor : "transparent",
-                      marginBottom: gap,
-                    },
-                  ]}
-                />
-              );
-            })}
+      {/* Month labels row */}
+      {showMonthLabels && (
+        <View
+          style={{
+            flexDirection: "row",
+            // marginLeft: showDayLabels ? 30 : 0,
+            marginBottom: 4,
+          }}
+        >
+          {monthLabels.map((label, i) => (
+            <View
+              key={i}
+              style={{
+                width: adjustedCellSize,
+                marginRight: gap,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: 8, color: "#555" }}>{label}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Main grid */}
+      <View style={{ flexDirection: "row" }}>
+        {/* Day labels column */}
+        {showDayLabels && (
+          <View style={{ marginRight: 4, justifyContent: "space-between" }}>
+            {dayLabels.map((d, i) => (
+              <Text
+                key={i}
+                style={{
+                  fontSize: 8,
+                  color: "#555",
+                  height: adjustedCellSize,
+                }}
+              >
+                {/* {i % 2 === 0 ? d : ""} Show alternate day labels */}
+                {d}
+              </Text>
+            ))}
           </View>
-        ))}
+        )}
+
+        {/* Grid columns */}
+        <View style={{ flexDirection: "row" }}>
+          {Array.from({ length: columns }).map((_, col) => (
+            <View
+              key={col}
+              style={{ flexDirection: "column", marginRight: gap }}
+            >
+              {Array.from({ length: rows }).map((_, row) => {
+                const index = col * rows + row;
+                const date = gridDates[index];
+                const dateKey = date.toDateString();
+                const isToday = isSameDay(date, today);
+                const isFuture = date > today;
+                const active = contributionMap[dateKey] === true;
+
+                return (
+                  <View
+                    key={row}
+                    style={[
+                      cellStyle,
+                      {
+                        backgroundColor: isFuture
+                          ? inactiveColor
+                          : active
+                          ? activeColor
+                          : inactiveColor,
+                        borderWidth: isToday ? 1 : 0,
+                        borderColor: isToday ? borderColor : "transparent",
+                        marginBottom: gap,
+                      },
+                    ]}
+                  >
+                    {showDate && (
+                      <Text
+                        style={{
+                          color: "#fff",
+                          fontWeight: "bold",
+                          fontSize: 8,
+                        }}
+                      >
+                        {date.getDate()}
+                      </Text>
+                    )}
+                  </View>
+                );
+              })}
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );
