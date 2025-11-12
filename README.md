@@ -1,7 +1,6 @@
 # 🟩 React Native Contribution Grid Heatmap
 
 A **beautiful and customizable contribution grid or heatmap** component for React Native apps — inspired by GitHub activity graphs.  
-Designed and maintained by **React Native Lab** 🧪.
 
 ---
 
@@ -130,7 +129,3 @@ export default function App() {
 | `showDate`         | `Boolean`                                     | `true`    | Show date inside grid cell    |
 | `showDayLabels`    | `Boolean`                                     | `true`    | Show day labels on grid       |
 | `showMonthLabels`  | `Boolean`                                     | `true`    | Show month labels on grid     |
-
-## About React Native Lab
-
-React Native Lab (RNL) is an initiative by Harshal Dhawale to create clean, modern, and open-source UI components for React Native developers.
