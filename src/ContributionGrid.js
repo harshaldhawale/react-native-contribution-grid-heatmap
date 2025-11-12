@@ -1,11 +1,37 @@
 import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 
+// ✅ Enhanced HEX → RGB converter (supports #RGB and #RRGGBB)
+const hexToRgb = (hex) => {
+  const sanitized = hex.replace("#", "");
+  const fullHex =
+    sanitized.length === 3
+      ? sanitized
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : sanitized;
+
+  const bigint = parseInt(fullHex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return [r, g, b];
+};
+
+// ✅ Lighten/Darken a color based on factor
+const shadeColor = (color, factor) => {
+  const [r, g, b] = hexToRgb(color);
+  const mix = (c) =>
+    Math.min(255, Math.max(0, Math.floor(c * factor + 255 * (1 - factor))));
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+};
+
 const ContributionGrid = ({
-  title = "title",
+  title = "Contributions",
   titleStyle = {},
-  showTitle = true,
-  data = [], // Example: [{ date: '2025-11-08', contributed: true }]
+  data = [],
   activeColor = "#4CAF50",
   inactiveColor = "#E0E0E0",
   backgroundColor = "#F8F8F8",
@@ -18,32 +44,44 @@ const ContributionGrid = ({
   showDate = true,
   showMonthLabels = true,
   showDayLabels = true,
+  showHeatmap = true,
 }) => {
-  const rows = 7; // Sunday to Saturday
+  const rows = 7;
   const today = new Date();
 
-  // Calculate start (first visible Sunday) and end (upcoming Saturday)
+  // --- Generate 5 dynamic heatmap shades ---
+  const heatmapColors = [
+    shadeColor(activeColor, 0.2), // level 1 (lightest)
+    shadeColor(activeColor, 0.4),
+    shadeColor(activeColor, 0.6),
+    shadeColor(activeColor, 0.8),
+    shadeColor(activeColor, 1.0), // level 5 (darkest)
+  ];
+
+  // --- Calculate visible range ---
   const daysSinceSunday = today.getDay();
   const endDate = new Date(today);
   endDate.setDate(today.getDate() + (6 - daysSinceSunday));
   const firstVisibleDate = new Date(endDate);
   firstVisibleDate.setDate(endDate.getDate() - (columns * 7 - 1));
 
-  // Generate all dates to display
+  // --- Generate grid dates ---
   const gridDates = Array.from({ length: columns * 7 }, (_, i) => {
     const d = new Date(firstVisibleDate);
     d.setDate(firstVisibleDate.getDate() + i);
     return d;
   });
 
-  // Convert input data into a map for faster lookup
+  // --- Create contribution map for fast lookup ---
   const contributionMap = {};
   data.forEach((item) => {
-    const dateKey = new Date(item.date).toDateString();
-    contributionMap[dateKey] = item.contributed;
+    const key = new Date(item.date).toDateString();
+    contributionMap[key] = {
+      contributed: !!item.contributed,
+      level: item.level ?? 1,
+    };
   });
 
-  // Helpers
   const isSameDay = (d1, d2) =>
     d1.getDate() === d2.getDate() &&
     d1.getMonth() === d2.getMonth() &&
@@ -56,7 +94,7 @@ const ContributionGrid = ({
     containerPadding * 2 -
     containerMargin * 2 -
     totalGapWidth -
-    30; // space for day labels
+    30;
   const adjustedCellSize = Math.min(cellSize, availableWidth / columns);
 
   const cellStyle = {
@@ -67,24 +105,35 @@ const ContributionGrid = ({
     alignItems: "center",
   };
 
+  // --- Month and Day Labels ---
   const monthLabels = [];
   let lastMonth = null;
-
   for (let c = 0; c < columns; c++) {
     const firstDateOfColumn = gridDates[c * rows];
     const monthName = firstDateOfColumn.toLocaleString("default", {
       month: "short",
     });
-
     if (monthName !== lastMonth) {
       monthLabels.push(monthName);
       lastMonth = monthName;
     } else {
-      monthLabels.push(""); // Empty label for same month
+      monthLabels.push("");
     }
   }
+  const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  const dayLabels = ["S", "M", "T", "W", "T", "F", "S"];
+  // --- Get cell color ---
+  const getCellColor = (dateKey, isFuture) => {
+    if (isFuture) return inactiveColor;
+    const entry = contributionMap[dateKey];
+    if (!entry || !entry.contributed) return inactiveColor;
+
+    if (!showHeatmap) return activeColor;
+
+    const { level } = entry;
+    const index = Math.min(Math.max(level, 1), 5) - 1; // clamp 1–5
+    return heatmapColors[index];
+  };
 
   return (
     <View
@@ -93,14 +142,16 @@ const ContributionGrid = ({
         { backgroundColor, margin: containerMargin, padding: containerPadding },
       ]}
     >
-      {showTitle && <Text style={titleStyle}>{title}</Text>}
+      <Text style={[{ fontWeight: "bold", marginBottom: 5 }, titleStyle]}>
+        {title}
+      </Text>
 
-      {/* Month labels row */}
+      {/* Month labels */}
       {showMonthLabels && (
         <View
           style={{
             flexDirection: "row",
-            // marginLeft: showDayLabels ? 30 : 0,
+            marginLeft: showDayLabels ? 20 : 0,
             marginBottom: 4,
           }}
         >
@@ -119,9 +170,8 @@ const ContributionGrid = ({
         </View>
       )}
 
-      {/* Main grid */}
+      {/* Grid section */}
       <View style={{ flexDirection: "row" }}>
-        {/* Day labels column */}
         {showDayLabels && (
           <View style={{ marginRight: 4, justifyContent: "space-between" }}>
             {dayLabels.map((d, i) => (
@@ -133,7 +183,6 @@ const ContributionGrid = ({
                   height: adjustedCellSize,
                 }}
               >
-                {/* {i % 2 === 0 ? d : ""} Show alternate day labels */}
                 {d}
               </Text>
             ))}
@@ -153,7 +202,6 @@ const ContributionGrid = ({
                 const dateKey = date.toDateString();
                 const isToday = isSameDay(date, today);
                 const isFuture = date > today;
-                const active = contributionMap[dateKey] === true;
 
                 return (
                   <View
@@ -161,11 +209,7 @@ const ContributionGrid = ({
                     style={[
                       cellStyle,
                       {
-                        backgroundColor: isFuture
-                          ? inactiveColor
-                          : active
-                          ? activeColor
-                          : inactiveColor,
+                        backgroundColor: getCellColor(dateKey, isFuture),
                         borderWidth: isToday ? 1 : 0,
                         borderColor: isToday ? borderColor : "transparent",
                         marginBottom: gap,
@@ -176,7 +220,6 @@ const ContributionGrid = ({
                       <Text
                         style={{
                           color: "#fff",
-                          fontWeight: "bold",
                           fontSize: 8,
                         }}
                       >
