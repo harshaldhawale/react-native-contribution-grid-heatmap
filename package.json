@@ -31,5 +31,17 @@
   "peerDependencies": {
     "react": "^19.1.0",
     "react-native": "^0.81.5"
-  }
+  },
+  "contributors": [
+    {
+      "name": "Harshal Dhawale",
+      "email": "harshal.dhawale@gmail.com",
+      "url": "https://github.com/harshaldhawale"
+    },
+    {
+      "name": "React Native Lab",
+      "email": "reactnativelab95@gmail.com",
+      "url": "https://github.com/reactnativelab"
+    }
+  ]
 }
