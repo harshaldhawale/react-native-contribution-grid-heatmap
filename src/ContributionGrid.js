@@ -1,5 +1,11 @@
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // ✅ Enhanced HEX → RGB converter (supports #RGB and #RRGGBB)
 const hexToRgb = (hex) => {
@@ -31,6 +37,7 @@ const shadeColor = (color, factor) => {
 const ContributionGrid = ({
   title = "Contributions",
   titleStyle = {},
+  showTitle = true,
   data = [],
   activeColor = "#4CAF50",
   inactiveColor = "#E0E0E0",
@@ -45,17 +52,24 @@ const ContributionGrid = ({
   showMonthLabels = true,
   showDayLabels = true,
   showHeatmap = true,
+
+  // ✅ New Props for Action Button
+  showActionButton = false,
+  actionButtonTitle = "Action",
+  actionButtonStyle = {},
+  actionButtonTextStyle = {},
+  onActionPress = () => {},
 }) => {
   const rows = 7;
   const today = new Date();
 
   // --- Generate 5 dynamic heatmap shades ---
   const heatmapColors = [
-    shadeColor(activeColor, 0.2), // level 1 (lightest)
+    shadeColor(activeColor, 0.2),
     shadeColor(activeColor, 0.4),
     shadeColor(activeColor, 0.6),
     shadeColor(activeColor, 0.8),
-    shadeColor(activeColor, 1.0), // level 5 (darkest)
+    shadeColor(activeColor, 1.0),
   ];
 
   // --- Calculate visible range ---
@@ -131,7 +145,7 @@ const ContributionGrid = ({
     if (!showHeatmap) return activeColor;
 
     const { level } = entry;
-    const index = Math.min(Math.max(level, 1), 5) - 1; // clamp 1–5
+    const index = Math.min(Math.max(level, 1), 5) - 1;
     return heatmapColors[index];
   };
 
@@ -142,9 +156,39 @@ const ContributionGrid = ({
         { backgroundColor, margin: containerMargin, padding: containerPadding },
       ]}
     >
-      <Text style={[{ fontWeight: "bold", marginBottom: 5 }, titleStyle]}>
-        {title}
-      </Text>
+      {/* Title */}
+      {showTitle && (
+        <Text style={[{ fontWeight: "bold", marginBottom: 5 }, titleStyle]}>
+          {title}
+        </Text>
+      )}
+
+      {/* ✅ Action Button */}
+      {showActionButton && (
+        <TouchableOpacity
+          style={[
+            {
+              backgroundColor: activeColor,
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              borderRadius: 6,
+              alignSelf: "flex-end",
+              marginBottom: 8,
+            },
+            actionButtonStyle,
+          ]}
+          onPress={onActionPress}
+        >
+          <Text
+            style={[
+              { color: "#fff", fontWeight: "600" },
+              actionButtonTextStyle,
+            ]}
+          >
+            {actionButtonTitle}
+          </Text>
+        </TouchableOpacity>
+      )}
 
       {/* Month labels */}
       {showMonthLabels && (
