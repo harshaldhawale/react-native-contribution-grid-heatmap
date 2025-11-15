@@ -106,6 +106,7 @@ export default function App() {
 | `gap`                   | `number`                                                         | `4`       | Gap between cells               |
 | `columns`               | `number`                                                         | `16`      | Number of columns (weeks)       |
 | `showDate`              | `Boolean`                                                        | `true`    | Show date inside grid cell      |
+| `dateStyle`             | `Object`                                                         | `{}`      | Date style inside grid cell     |
 | `showDayLabels`         | `Boolean`                                                        | `true`    | Show day labels on grid         |
 | `showMonthLabels`       | `Boolean`                                                        | `true`    | Show month labels on grid       |
 | `showHeatmap`           | `Boolean`                                                        | `true`    | Show heatmap                    |

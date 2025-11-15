@@ -49,10 +49,7 @@ const ContributionGrid = ({
   gap = 4,
   columns = 16,
   showDate = true,
-  dateStyle = {
-    color: "#fff",
-    fontSize: 8,
-  },
+  dateStyle = {},
   showMonthLabels = true,
   showDayLabels = true,
   showHeatmap = true,
