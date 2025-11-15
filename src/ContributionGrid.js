@@ -49,6 +49,7 @@ const ContributionGrid = ({
   gap = 4,
   columns = 16,
   showDate = true,
+  dateStyle = {},
   showMonthLabels = true,
   showDayLabels = true,
   showHeatmap = true,
@@ -261,14 +262,7 @@ const ContributionGrid = ({
                     ]}
                   >
                     {showDate && (
-                      <Text
-                        style={{
-                          color: "#fff",
-                          fontSize: 8,
-                        }}
-                      >
-                        {date.getDate()}
-                      </Text>
+                      <Text style={dateStyle}>{date.getDate()}</Text>
                     )}
                   </View>
                 );
