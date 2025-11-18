@@ -115,3 +115,10 @@ export default function App() {
 | `actionButtonStyle`     | `Object`                                                         | `{}`      | Action button style object      |
 | `actionButtonTextStyle` | `Object`                                                         | `{}`      | Action button text style object |
 | `onActionPress`         | `Function`                                                       | `()=>{}`  | Action button onPress funtion   |
+
+
+## 🤝 Contributors
+
+Thanks to these amazing people:
+
+- **Harshal Dhawale** – Author  
