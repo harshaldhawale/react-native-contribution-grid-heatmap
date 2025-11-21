@@ -3,12 +3,49 @@ import {
   Dimensions,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
 } from "react-native";
 
-// ✅ Enhanced HEX → RGB converter (supports #RGB and #RRGGBB)
-const hexToRgb = (hex) => {
+// ----------------- Types -----------------
+export interface ContributionItem {
+  date: string | Date;
+  contributed: boolean;
+  level?: number;
+}
+
+export interface ContributionGridProps {
+  title?: string;
+  titleStyle?: TextStyle;
+  showTitle?: boolean;
+  data?: ContributionItem[];
+  activeColor?: string;
+  inactiveColor?: string;
+  backgroundColor?: string;
+  borderColor?: string;
+  containerPadding?: number;
+  containerMargin?: number;
+  cellSize?: number;
+  gap?: number;
+  columns?: number;
+  showDate?: boolean;
+  dateStyle?: TextStyle;
+  showMonthLabels?: boolean;
+  showDayLabels?: boolean;
+  showHeatmap?: boolean;
+
+  // Action Button Props
+  showActionButton?: boolean;
+  actionButtonTitle?: string;
+  actionButtonStyle?: ViewStyle;
+  actionButtonTextStyle?: TextStyle;
+  onActionPress?: () => void;
+}
+
+// ----------------- Color Utils -----------------
+const hexToRgb = (hex: string): [number, number, number] => {
   const sanitized = hex.replace("#", "");
   const fullHex =
     sanitized.length === 3
@@ -19,22 +56,19 @@ const hexToRgb = (hex) => {
       : sanitized;
 
   const bigint = parseInt(fullHex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-
-  return [r, g, b];
+  return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
 };
 
-// ✅ Lighten/Darken a color based on factor
-const shadeColor = (color, factor) => {
+const shadeColor = (color: string, factor: number): string => {
   const [r, g, b] = hexToRgb(color);
-  const mix = (c) =>
+  const mix = (c: number) =>
     Math.min(255, Math.max(0, Math.floor(c * factor + 255 * (1 - factor))));
+
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 };
 
-const ContributionGrid = ({
+// ----------------- Component -----------------
+const ContributionGrid: React.FC<ContributionGridProps> = ({
   title = "Contributions",
   titleStyle = {},
   showTitle = true,
@@ -48,13 +82,13 @@ const ContributionGrid = ({
   cellSize = 20,
   gap = 4,
   columns = 16,
-  showDate = true,
+  showDate = false,
   dateStyle = {},
   showMonthLabels = true,
   showDayLabels = true,
   showHeatmap = true,
 
-  // ✅ New Props for Action Button
+  // Action Button Props
   showActionButton = false,
   actionButtonTitle = "Action",
   actionButtonStyle = {},
@@ -64,7 +98,7 @@ const ContributionGrid = ({
   const rows = 7;
   const today = new Date();
 
-  // --- Generate 5 dynamic heatmap shades ---
+  // Dynamic heatmap shades
   const heatmapColors = [
     shadeColor(activeColor, 0.2),
     shadeColor(activeColor, 0.4),
@@ -73,46 +107,52 @@ const ContributionGrid = ({
     shadeColor(activeColor, 1.0),
   ];
 
-  // --- Calculate visible range ---
+  // Calculate visible date range
   const daysSinceSunday = today.getDay();
   const endDate = new Date(today);
   endDate.setDate(today.getDate() + (6 - daysSinceSunday));
+
   const firstVisibleDate = new Date(endDate);
   firstVisibleDate.setDate(endDate.getDate() - (columns * 7 - 1));
 
-  // --- Generate grid dates ---
-  const gridDates = Array.from({ length: columns * 7 }, (_, i) => {
+  const gridDates: Date[] = Array.from({ length: columns * 7 }, (_, i) => {
     const d = new Date(firstVisibleDate);
     d.setDate(firstVisibleDate.getDate() + i);
     return d;
   });
 
-  // --- Create contribution map for fast lookup ---
-  const contributionMap = {};
+  // Contribution lookup map
+  const contributionMap: Record<
+    string,
+    { contributed: boolean; level: number }
+  > = {};
   data.forEach((item) => {
     const key = new Date(item.date).toDateString();
     contributionMap[key] = {
-      contributed: !!item.contributed,
+      contributed: item.contributed,
       level: item.level ?? 1,
     };
   });
 
-  const isSameDay = (d1, d2) =>
-    d1.getDate() === d2.getDate() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getFullYear() === d2.getFullYear();
+  const isSameDay = (a: Date, b: Date): boolean =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
 
+  // Cell size calculation
   const screenWidth = Dimensions.get("window").width;
   const totalGapWidth = gap * (columns - 1);
+
   const availableWidth =
     screenWidth -
     containerPadding * 2 -
     containerMargin * 2 -
     totalGapWidth -
     30;
+
   const adjustedCellSize = Math.min(cellSize, availableWidth / columns);
 
-  const cellStyle = {
+  const cellStyle: ViewStyle = {
     width: adjustedCellSize,
     height: adjustedCellSize,
     borderRadius: 4,
@@ -120,35 +160,30 @@ const ContributionGrid = ({
     alignItems: "center",
   };
 
-  // --- Month and Day Labels ---
-  const monthLabels = [];
-  let lastMonth = null;
+  // Month & Day labels
+  const monthLabels: string[] = [];
+  let lastMonth: string | null = null;
+
   for (let c = 0; c < columns; c++) {
-    const firstDateOfColumn = gridDates[c * rows];
-    const monthName = firstDateOfColumn.toLocaleString("default", {
-      month: "short",
-    });
-    if (monthName !== lastMonth) {
-      monthLabels.push(monthName);
-      lastMonth = monthName;
-    } else {
-      monthLabels.push("");
-    }
+    const date = gridDates[c * rows];
+    const monthName = date.toLocaleString("default", { month: "short" });
+
+    monthLabels.push(monthName !== lastMonth ? monthName : "");
+    lastMonth = monthName;
   }
+
   const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // --- Get cell color ---
-  const getCellColor = (dateKey, isFuture) => {
-    if (isFuture) return inactiveColor;
-    const entry = contributionMap[dateKey];
-    if (!entry || !entry.contributed) return inactiveColor;
-
-    if (!showHeatmap) return activeColor;
-
-    const { level } = entry;
-    const index = Math.min(Math.max(level, 1), 5) - 1;
-    return heatmapColors[index];
-  };
+  const getCellColor = (dateKey: string, isFuture: boolean): string =>
+    isFuture
+      ? inactiveColor
+      : contributionMap[dateKey]?.contributed
+      ? showHeatmap
+        ? heatmapColors[
+            Math.min(Math.max(contributionMap[dateKey].level, 1), 5) - 1
+          ]
+        : activeColor
+      : inactiveColor;
 
   return (
     <View
@@ -164,7 +199,7 @@ const ContributionGrid = ({
         </Text>
       )}
 
-      {/* ✅ Action Button */}
+      {/* Optional Action Button */}
       {showActionButton && (
         <TouchableOpacity
           style={[
@@ -191,7 +226,7 @@ const ContributionGrid = ({
         </TouchableOpacity>
       )}
 
-      {/* Month labels */}
+      {/* Month Labels */}
       {showMonthLabels && (
         <View
           style={{
@@ -200,7 +235,7 @@ const ContributionGrid = ({
             marginBottom: 4,
           }}
         >
-          {monthLabels.map((label, i) => (
+          {monthLabels.map((m, i) => (
             <View
               key={i}
               style={{
@@ -209,24 +244,20 @@ const ContributionGrid = ({
                 alignItems: "center",
               }}
             >
-              <Text style={{ fontSize: 8, color: "#555" }}>{label}</Text>
+              <Text style={{ fontSize: 8, color: "#555" }}>{m}</Text>
             </View>
           ))}
         </View>
       )}
 
-      {/* Grid section */}
+      {/* Day labels + Grid */}
       <View style={{ flexDirection: "row" }}>
         {showDayLabels && (
           <View style={{ marginRight: 4, justifyContent: "space-between" }}>
             {dayLabels.map((d, i) => (
               <Text
                 key={i}
-                style={{
-                  fontSize: 8,
-                  color: "#555",
-                  height: adjustedCellSize,
-                }}
+                style={{ fontSize: 8, color: "#555", height: adjustedCellSize }}
               >
                 {d}
               </Text>
@@ -234,7 +265,7 @@ const ContributionGrid = ({
           </View>
         )}
 
-        {/* Grid columns */}
+        {/* Columns */}
         <View style={{ flexDirection: "row" }}>
           {Array.from({ length: columns }).map((_, col) => (
             <View
@@ -275,11 +306,12 @@ const ContributionGrid = ({
   );
 };
 
+// ----------------- Styles -----------------
 const styles = StyleSheet.create({
   container: {
     alignSelf: "center",
     borderRadius: 8,
-  },
+  } as ViewStyle,
 });
 
 export default ContributionGrid;
