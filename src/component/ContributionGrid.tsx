@@ -244,13 +244,19 @@ const ContributionGrid: React.FC<ContributionGridProps> = ({
                 const isToday = isSameDay(date, today);
                 const isFuture = date > today;
 
+                const baseColor = getCellColor(dateKey, isFuture);
+                const todayContributed =
+                  isToday && contributionMap[dateKey]?.contributed === true;
+
                 return (
                   <View
                     key={row}
                     style={[
                       cellStyle,
                       {
-                        backgroundColor: getCellColor(dateKey, isFuture),
+                        backgroundColor: todayContributed
+                          ? activeColor
+                          : baseColor,
                         borderWidth: isToday ? 1 : 0,
                         borderColor: isToday ? borderColor : "transparent",
                         marginBottom: gap,
