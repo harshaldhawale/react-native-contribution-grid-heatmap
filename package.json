@@ -1,6 +1,6 @@
 {
   "name": "react-native-contribution-grid-heatmap",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "A customizable contribution grid heatmap component for React Native apps.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
