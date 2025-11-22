@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "jsx": "react",
-    "allowJs": false,
-    "strict": true,
-    "declaration": true,
-    "declarationDir": "dist/types",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
     "outDir": "dist",
-    "emitDeclarationOnly": false
+    "target": "ES2019",
+    "module": "ESNext",
+    "jsx": "react-native",
+    "moduleResolution": "node",
+    "declaration": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*"]
+  "include": ["src"]
 }
