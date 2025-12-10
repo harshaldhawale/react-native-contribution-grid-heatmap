@@ -16,7 +16,7 @@ npm install react-native-contribution-grid-heatmap
 yarn add react-native-contribution-grid-heatmap
 ```
 
-## Example 1
+## Example
 
 <image src="/assets/contribution-grid1.jpg" alt=""/>
 
@@ -42,38 +42,6 @@ export default function App() {
         showTitle={true}
         data={contributionData}
         showHeatmap={true}
-      />
-    </View>
-  );
-}
-```
-
-## Example 2
-
-<image src="/assets/contribution-grid2.jpg" alt=""/>
-
-## Usage/Examples
-
-```javascript
-import React from "react";
-import { View } from "react-native";
-import ContributionGrid from "react-native-contribution-grid-heatmap";
-
-const contributionData = [
-  { date: "2025-10-06", contributed: true },
-  { date: "2025-10-10", contributed: true },
-  { date: "2025-11-04", contributed: true },
-];
-
-export default function App() {
-  return (
-    <View>
-      <ContributionGrid
-        title="Contribution Grid Title"
-        titleStyle={{ marginBottom: 10, fontWeight: "bold" }}
-        showTitle={false}
-        data={contributionData}
-        showHeatmap={false}
       />
     </View>
   );
